@@ -1,0 +1,141 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'stage', 'prod'],
+            description: '选择要部署的环境'
+        )
+    }
+
+    environment {
+        // Alicloud Credentials Plugin 会自动注入以下环境变量：
+        // ALIBABA_CLOUD_ACCESS_KEY_ID
+        // ALIBABA_CLOUD_ACCESS_KEY_SECRET
+
+        // 将这些映射为 Terraform 需要的变量
+        TF_VAR_alicloud_access_key = "${env.ALIBABA_CLOUD_ACCESS_KEY_ID}"
+        TF_VAR_alicloud_secret_key = "${env.ALIBABA_CLOUD_ACCESS_KEY_SECRET}"
+
+        FEISHU_WEBHOOK = credentials('feishu-webhook-url')
+        TF_VAR_feishu_webhook_url = "${FEISHU_WEBHOOK}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'feature/kerwin2',
+                    url: 'https://github.com/2551390302/Devops-demo.git',
+                    credentialsId: 'github-devops-terraform'
+            }
+        }
+
+        stage('Test Alicloud Credentials') {
+            steps {
+                script {
+                    echo "Testing Alicloud Credentials Plugin..."
+                    sh 'echo "Access Key ID is set: ${ALIBABA_CLOUD_ACCESS_KEY_ID:+yes}"'
+                    sh 'echo "Region: ${ALIBABA_CLOUD_REGION:-not set}"'
+                    sh 'aliyun configure get || true'
+                }
+            }
+        }
+
+        stage('switch to relevant env folder') {
+            steps {
+                script {
+                    dir("Terraform/environments/${params.ENVIRONMENT}") {
+                        // 后续 stage 会在此目录下执行
+                        // 但 dir 的作用域有限，所以需要在每个 stage 中重新进入
+                        // 我们可以在每个 Terraform stage 中显式使用 dir
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir("Terraform/environments/${params.ENVIRONMENT}") {
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                dir("Terraform/environments/${params.ENVIRONMENT}") {
+                    sh 'terraform fmt -check'
+                    sh 'terraform validate'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir("Terraform/environments/${params.ENVIRONMENT}") {
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: "Terraform/environments/${params.ENVIRONMENT}/tfplan"
+                }
+            }
+        }
+
+        stage('Approval') {
+            when {
+                expression { params.ENVIRONMENT == 'prod' }
+            }
+            steps {
+                input message: "是否批准将计划应用到生产环境？请确认变更。", ok: '批准'
+            }
+        }
+
+        stage('Clean Helm Pending') {
+            steps {
+                script {
+                    dir("Terraform/environments/${params.ENVIRONMENT}") {
+                        sh '''
+                            if helm ls -n nsp-d-devops01-monitoring | grep prometheus | grep -E 'pending|failed'; then
+                                echo "Found pending/failed release, trying to rollback..."
+                                helm rollback prometheus 1 -n nsp-d-devops01-monitoring || true
+                            fi
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir("Terraform/environments/${params.ENVIRONMENT}") {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
+            }
+            post {
+                success {
+                    script {
+                        dir("Terraform/environments/${params.ENVIRONMENT}") {
+                            sh 'terraform output -raw ack_kubeconfig > kubeconfig || true'
+                        }
+                        stash name: 'kubeconfig', includes: "environments/${params.ENVIRONMENT}/kubeconfig", allowEmpty: true
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "环境 ${params.ENVIRONMENT} 基础设施变更成功！"
+        }
+        failure {
+            echo "环境 ${params.ENVIRONMENT} 基础设施变更失败，请检查日志。"
+        }
+    }
+}
