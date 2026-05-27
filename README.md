@@ -1,39 +1,4 @@
-5. **触发 Jenkins Pipeline**（或本地模拟）
-   - Jenkins 会自动完成：构建应用 → 推送到 ACR → 部署到 ACK
-
-6. **访问监控 UI**
-   - Grafana: `http://<grafana-lb-ip>`
-   - Prometheus: `http://prometheus.<ingress-ip>.nip.io`
-
-## 📊 监控效果（示例）
-
-> - Grafana 仪表盘展示 JVM 内存使用率、CPU 使用率、HTTP 请求速率
-> - Prometheus Targets 页面显示 `demo-app` 状态为 `UP`
-> - Alertmanager 中配置了 Pod 重启告警
-
-## ⚠️ 注意事项
-
-1. **阿里云 RAM 权限**：确保使用的 AccessKey 具有创建 VPC、ACK、ACR 等资源的权限
-2. **地域选择**：根据实际需求选择合适的阿里云地域和可用区
-3. **成本控制**：开发环境建议使用按量付费实例，生产环境考虑包年包月
-4. **安全组配置**：默认会创建企业级安全组，可根据需要调整规则
-5. **存储类型**：监控数据使用云盘 SSD，可根据性能需求调整存储类型
-
-请确保代码通过 `terraform fmt` 和 `terraform validate`。
-关于app部分放在了另一个仓库，需要可以联系我。
-
-**项目地址**：https://github.com/yourname/devops-demo  
-**联系方式**：2551390302@qq.com
-4. **运行 Terraform 创建 ACK**
-   2. **配置阿里云凭据**
-   - 在 Jenkins 中添加凭据：`alicloud-access-key`, `alicloud-secret-key`
-   - 确保有相应的 RAM 权限
-
-3. **修改环境变量**（`Terraform/environments/dev/terraform.tfvars`）
-   ## 🔧 快速部署（开发者本地）
-
-1. **克隆仓库**
-   # 项目描述：阿里云 DevOps - 基础设施即代码 + 应用部署 + 可观测性
+# 项目描述：阿里云 DevOps - 基础设施即代码 + 应用部署 + 可观测性
 
 ## 📖 项目概述
 
@@ -57,10 +22,10 @@
                                                        │
                                                        ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                         Azure 资源组                             │
+│                       阿里云资源                                 │
 │  ┌──────────┐   ┌──────────────┐   ┌──────────────────────┐    │
-│  │   VNet   │   │    AKS       │   │          ACR         │    │
-│  │ + Subnet │   │  集群        │   │   (容器镜像仓库)      │    │
+│  │   VPC    │   │    ACK       │   │          ACR         │    │
+│  │ + VSwitch│   │  集群        │   │   (容器镜像仓库)      │    │
 │  └──────────┘   └──────┬───────┘   └──────────────────────┘    │
 │                         │                                        │
 │                         ▼                                        │
@@ -82,19 +47,19 @@
 ## 🚀 主要功能
 
 ### 1. 基础设施自动化
-- 使用 Terraform 管理 Azure 资源（资源组、VNet、子网、AKS 集群）
-- 远程状态存储于 Azure Storage Account（带锁机制）
+- 使用 Terraform 管理阿里云资源（VPC、VSwitch、ACK 集群）
+- 远程状态存储于阿里云 OSS（带锁机制）
 - 环境隔离：`dev` / `staging` / `prod` 目录
 
 ### 2. CI/CD 流水线
 - Jenkins Pipeline 从 GitHub 拉取代码
 - Maven 构建 Spring Boot 应用
-- 使用 `az acr build` 在云端构建并推送镜像到 ACR
-- 动态获取 AKS 凭证并部署应用
+- 使用阿里云 CLI 构建并推送镜像到 ACR
+- 动态获取 ACK 凭证并部署应用
 
 ### 3. 可观测性
 - 通过 Helm 部署 `kube-prometheus-stack`（Prometheus + Grafana）
-- 持久化存储（Premium SSD）保留监控数据
+- 持久化存储（云盘 SSD）保留监控数据
 - ServiceMonitor 自动发现应用指标端点
 - 通过 Ingress + Let's Encrypt 安全暴露 Grafana 和 Prometheus
 
@@ -112,12 +77,12 @@
 
 | 类别          | 工具/平台                          |
 |---------------|------------------------------------|
-| 云平台        | Microsoft Azure                    |
+| 云平台        | 阿里云 (Alibaba Cloud)             |
 | 基础设施编排  | Terraform                          |
 | CI/CD         | Jenkins                            |
 | 代码仓库      | GitHub                             |
-| 容器镜像仓库  | Azure Container Registry (ACR)     |
-| 容器编排      | Azure Kubernetes Service (AKS)     |
+| 容器镜像仓库  | 阿里云容器镜像服务 (ACR)           |
+| 容器编排      | 阿里云容器服务 Kubernetes (ACK)    |
 | 监控          | Prometheus + Grafana               |
 | 应用框架      | Spring Boot (Java)                 |
 | 构建工具      | Maven                              |
@@ -131,15 +96,15 @@
 ├── Terraform/
 │   ├── environments/
 │   │   ├── dev/
-│   │   │   ├── main.tf             # 根模块（网络、AKS、监控）
+│   │   │   ├── main.tf             # 根模块（网络、ACK、监控）
 │   │   │   ├── variables.tf
 │   │   │   ├── terraform.tfvars
 │   │   │   └── backend.tf
 │   │   ├── staging/
 │   │   └── prod/
 │   └── modules/
-│       ├── networking/             # VNet & 子网模块
-│       └── aks/                    # AKS 集群模块
+│       ├── networking/             # VPC & VSwitch 模块
+│       └── aks/                    # ACK 集群模块
 ├── k8s/
 │   ├── deployment.yaml             # 应用 Deployment & Service
 │   └── servicemonitor.yaml         # Prometheus ServiceMonitor
@@ -154,15 +119,17 @@
    cd devops-demo
    ```
 
-2. **配置 Azure 凭据**（服务主体）
-   - 在 Jenkins 中添加凭据：`azure-client-id`, `azure-client-secret`, `azure-tenant-id`, `azure-subscription-id`
+2. **配置阿里云凭据**
+   - 在 Jenkins 中添加凭据：`alicloud-access-key`, `alicloud-secret-key`
+   - 确保有相应的 RAM 权限
 
 3. **修改环境变量**（`Terraform/environments/dev/terraform.tfvars`）
    ```hcl
-   main_subscription_id = "your-sub-id"
+   alicloud_region            = "cn-hangzhou"
+   alicloud_availability_zone = "cn-hangzhou-i"
    ```
 
-4. **运行 Terraform 创建 AKS**
+4. **运行 Terraform 创建 ACK**
    ```bash
    cd Terraform/environments/dev
    terraform init
@@ -170,7 +137,7 @@
    ```
 
 5. **触发 Jenkins Pipeline**（或本地模拟）
-   - Jenkins 会自动完成：构建应用 → 推送到 ACR → 部署到 AKS
+   - Jenkins 会自动完成：构建应用 → 推送到 ACR → 部署到 ACK
 
 6. **访问监控 UI**
    - Grafana: `http://<grafana-lb-ip>`
@@ -182,7 +149,13 @@
 > - Prometheus Targets 页面显示 `demo-app` 状态为 `UP`
 > - Alertmanager 中配置了 Pod 重启告警
 
-## 注意
+## ⚠️ 注意事项
+
+1. **阿里云 RAM 权限**：确保使用的 AccessKey 具有创建 VPC、ACK、ACR 等资源的权限
+2. **地域选择**：根据实际需求选择合适的阿里云地域和可用区
+3. **成本控制**：开发环境建议使用按量付费实例，生产环境考虑包年包月
+4. **安全组配置**：默认会创建企业级安全组，可根据需要调整规则
+5. **存储类型**：监控数据使用云盘 SSD，可根据性能需求调整存储类型
 
 请确保代码通过 `terraform fmt` 和 `terraform validate`。
 关于app部分放在了另一个仓库，需要可以联系我。
