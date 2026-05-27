@@ -10,13 +10,15 @@ pipeline {
     }
 
     environment {
-        // Alicloud Credentials Plugin 会自动注入以下环境变量：
-        // ALIBABA_CLOUD_ACCESS_KEY_ID
-        // ALIBABA_CLOUD_ACCESS_KEY_SECRET
-
+        // 使用 Jenkins 标准凭据管理
+        ALICLOUD_ACCESS_KEY = credentials('alicloud-access-key')
+        ALICLOUD_SECRET_KEY = credentials('alicloud-secret-key')
+        ALICLOUD_REGION = 'cn-hangzhou'
+        
         // 将这些映射为 Terraform 需要的变量
-        TF_VAR_alicloud_access_key = "${env.ALIBABA_CLOUD_ACCESS_KEY_ID}"
-        TF_VAR_alicloud_secret_key = "${env.ALIBABA_CLOUD_ACCESS_KEY_SECRET}"
+        TF_VAR_alicloud_access_key = "${ALICLOUD_ACCESS_KEY}"
+        TF_VAR_alicloud_secret_key = "${ALICLOUD_SECRET_KEY}"
+        TF_VAR_alicloud_region = "${ALICLOUD_REGION}"
 
         FEISHU_WEBHOOK = credentials('feishu-webhook-url')
         TF_VAR_feishu_webhook_url = "${FEISHU_WEBHOOK}"
@@ -34,10 +36,9 @@ pipeline {
         stage('Test Alicloud Credentials') {
             steps {
                 script {
-                    echo "Testing Alicloud Credentials Plugin..."
-                    sh 'echo "Access Key ID is set: ${ALIBABA_CLOUD_ACCESS_KEY_ID:+yes}"'
-                    sh 'echo "Region: ${ALIBABA_CLOUD_REGION:-not set}"'
-                    sh 'aliyun configure get || true'
+                    echo "Testing Alicloud Credentials..."
+                    sh 'echo "Access Key ID is set: ${ALICLOUD_ACCESS_KEY:+yes}"'
+                    sh 'echo "Region: ${ALICLOUD_REGION:-not set}"'
                 }
             }
         }
