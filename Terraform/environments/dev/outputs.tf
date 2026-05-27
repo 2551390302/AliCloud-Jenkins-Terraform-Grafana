@@ -24,7 +24,7 @@ output "kubeconfig" {
   sensitive   = true
 }
 
-output "acr_instance_id" {
-  description = "ACR 实例 ID"
-  value       = alicloud_cr_instance.acr.id
+output "acr_namespace" {
+  description = "ACR 命名空间"
+  value       = alicloud_cr_namespace.acr.name
 }

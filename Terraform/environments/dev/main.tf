@@ -86,9 +86,9 @@ module "ack" {
   worker_system_disk_category = "cloud_ssd"
   worker_system_disk_size     = 40
 
-  worker_number     = 2
-  new_nat_gateway   = true
-  resource_group_id = local.resource_group_id
+  worker_number       = 2
+  new_nat_gateway     = true
+  resource_group_id   = local.resource_group_id
 
   tags = {
     ApplicationOwner = "Kerwin Li"
@@ -211,6 +211,20 @@ resource "alicloud_cr_instance" "acr" {
   name               = "acr-devops01-${random_string.suffix.result}"
   instance_type      = "Standard"
   load_balancer_spec = "slb.s2.small"
+
+  tags = {
+    ApplicationOwner = "Kerwin Li"
+    ApplicationName  = "devops-demo"
+    Environment      = "dev"
+    CreatedAt        = formatdate("YYYY-MM-DD hh:mm:ss", time_static.this.rfc3339)
+  }
+}
+
+# ACR 个人版命名空间（免费）
+resource "alicloud_cr_namespace" "acr" {
+  name               = "devops01-${random_string.suffix.result}"
+  auto_create        = false
+  default_visibility = "PRIVATE"
 
   tags = {
     ApplicationOwner = "Kerwin Li"
