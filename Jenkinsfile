@@ -12,7 +12,7 @@ pipeline {
     environment {
         // 使用 Jenkins 标准凭据管理
         ALICLOUD_CREDS = credentials('Ali-Cloud-credentials')
-        ALICLOUD_REGION = 'cn-hangzhou'
+        ALICLOUD_REGION = 'cn-chengdu'
         
         // 将这些映射为 Terraform 需要的变量
         TF_VAR_alicloud_access_key = "${ALICLOUD_CREDS_USR}"
