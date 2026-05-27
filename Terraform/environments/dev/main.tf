@@ -17,6 +17,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.12"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
   }
 }
 
@@ -40,15 +44,6 @@ provider "helm" {
 resource "time_static" "this" {}
 
 
-locals {
-  resource_group_name = "rg-kk02-eas-devops01"
-  common_tags = {
-    ApplicationOwner = "Kerwin Li"
-    ApplicationName  = "devops-demo"
-    Environment      = "dev"
-    CreatedAt        = formatdate("YYYY-MM-DD hh:mm:ss", time_static.this.rfc3339)
-  }
-}
 
 module "networking" {
   source = "../../modules/networking"
@@ -57,7 +52,12 @@ module "networking" {
   vswitch_cidr_blocks = ["172.16.1.0/24"]
   availability_zone   = var.alicloud_availability_zone
 
-  tags = local.common_tags
+  tags = {
+    ApplicationOwner = "Kerwin Li"
+    ApplicationName  = "devops-demo"
+    Environment      = "dev"
+    CreatedAt        = formatdate("YYYY-MM-DD hh:mm:ss", time_static.this.rfc3339)
+  }
 }
 
 module "aks" {
@@ -74,9 +74,12 @@ module "aks" {
   worker_number   = 2
   new_nat_gateway = true
 
-  tags = merge(local.common_tags, {
-    ServerOwner = "Kerwin Li"
-  })
+  tags = {
+    ApplicationOwner = "Kerwin Li"
+    ApplicationName  = "devops-demo"
+    Environment      = "dev"
+    ServerOwner      = "Kerwin Li"
+  }
 }
 
 resource "kubernetes_namespace" "monitoring" {
@@ -193,7 +196,12 @@ resource "alicloud_cr_instance" "acr" {
   instance_type      = "Standard"
   load_balancer_spec = "slb.s2.small"
 
-  tags = local.common_tags
+  tags = {
+    ApplicationOwner = "Kerwin Li"
+    ApplicationName  = "devops-demo"
+    Environment      = "dev"
+    CreatedAt        = formatdate("YYYY-MM-DD hh:mm:ss", time_static.this.rfc3339)
+  }
 }
 
 resource "random_string" "suffix" {

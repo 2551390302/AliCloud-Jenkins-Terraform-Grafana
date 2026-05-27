@@ -25,8 +25,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'feature/kerwin2',
-                    url: 'https://github.com/2551390302/Devops-demo.git',
+                git branch: 'feature/init',
+                    url: 'https://github.com/2551390302/AliCloud-Jenkins-Terraform-Grafana.git',
                     credentialsId: 'github-devops-terraform'
             }
         }
@@ -118,9 +118,9 @@ pipeline {
                 success {
                     script {
                         dir("Terraform/environments/${params.ENVIRONMENT}") {
-                            sh 'terraform output -raw ack_kubeconfig > kubeconfig || true'
+                            sh 'terraform output -raw kubeconfig > kubeconfig || true'
                         }
-                        stash name: 'kubeconfig', includes: "environments/${params.ENVIRONMENT}/kubeconfig", allowEmpty: true
+                        stash name: 'kubeconfig', includes: "Terraform/environments/${params.ENVIRONMENT}/kubeconfig", allowEmpty: true
                     }
                 }
             }

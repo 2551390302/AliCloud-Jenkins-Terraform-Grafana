@@ -1,13 +1,3 @@
-variable "resource_group_name" {
-  description = "资源组名称"
-  type        = string
-}
-
-variable "location" {
-  description = "Azure 区域"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "ACK 集群名称"
   type        = string
@@ -82,35 +72,4 @@ variable "max_pods" {
   description = "每个节点的最大 Pod 数"
   type        = number
   default     = 30
-}
-
-variable "existing_vnet_name" {
-  description = "现有 VNet 名称（当 create_vnet = false 时必填）"
-  type        = string
-  default     = "vnet-kk02-eas-devops01"
-}
-
-variable "tags" {
-  description = "要应用到资源的标签"
-  type        = map(string)
-  default     = {}
-}
-
-variable "zones" {
-  description = "可用区列表，例如 [\"1\", \"2\", \"3\"]；设置为 [] 可禁用可用区"
-  type        = list(string)
-  default     = null
-}
-
-# 在 modules/aks/variables.tf 中添加
-variable "os_disk_size_gb" {
-  description = "节点 OS 磁盘大小（GB）"
-  type        = number
-  default     = 30
-}
-
-variable "kubernetes_version" {
-  description = "Kubernetes 版本，例如 1.29.2"
-  type        = string
-  default     = null # null 表示使用 AKS 默认版本
 }
