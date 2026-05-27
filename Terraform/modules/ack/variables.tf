@@ -49,27 +49,8 @@ variable "tags" {
   default     = {}
 }
 
-# 自动缩放相关变量
-variable "enable_auto_scaling" {
-  description = "是否启用节点池自动缩放"
-  type        = bool
-  default     = false
-}
-
-variable "min_nodes" {
-  description = "最小节点数"
-  type        = number
-  default     = 1
-}
-
-variable "max_nodes" {
-  description = "最大节点数"
-  type        = number
-  default     = 1
-}
-
-variable "max_pods" {
-  description = "每个节点的最大 Pod 数"
-  type        = number
-  default     = 30
+variable "resource_group_id" {
+  description = "资源组 ID"
+  type        = string
+  default     = ""
 }

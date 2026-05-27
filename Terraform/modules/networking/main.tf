@@ -1,6 +1,7 @@
 resource "alicloud_vpc" "this" {
-  vpc_name   = "vpc-devops01"
-  cidr_block = var.vpc_cidr_block
+  vpc_name          = "vpc-devops01"
+  cidr_block        = var.vpc_cidr_block
+  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : null
 
   tags = var.tags
 }

@@ -16,3 +16,14 @@ variable "availability_zone" {
   default     = "cn-hangzhou-i"
 }
 
+variable "tags" {
+  description = "要应用到资源的标签"
+  type        = map(string)
+  default     = {}
+}
+
+variable "resource_group_id" {
+  description = "资源组 ID"
+  type        = string
+  default     = ""
+}
