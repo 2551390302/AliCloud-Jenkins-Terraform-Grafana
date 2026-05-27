@@ -11,13 +11,12 @@ pipeline {
 
     environment {
         // 使用 Jenkins 标准凭据管理
-        ALICLOUD_ACCESS_KEY = credentials('alicloud-access-key')
-        ALICLOUD_SECRET_KEY = credentials('alicloud-secret-key')
+        ALICLOUD_CREDS = credentials('Ali-Cloud-credentials')
         ALICLOUD_REGION = 'cn-hangzhou'
         
         // 将这些映射为 Terraform 需要的变量
-        TF_VAR_alicloud_access_key = "${ALICLOUD_ACCESS_KEY}"
-        TF_VAR_alicloud_secret_key = "${ALICLOUD_SECRET_KEY}"
+        TF_VAR_alicloud_access_key = "${ALICLOUD_CREDS_USR}"
+        TF_VAR_alicloud_secret_key = "${ALICLOUD_CREDS_PSW}"
         TF_VAR_alicloud_region = "${ALICLOUD_REGION}"
 
         FEISHU_WEBHOOK = credentials('feishu-webhook-url')
@@ -37,7 +36,7 @@ pipeline {
             steps {
                 script {
                     echo "Testing Alicloud Credentials..."
-                    sh 'echo "Access Key ID is set: ${ALICLOUD_ACCESS_KEY:+yes}"'
+                    sh 'echo "Access Key ID is set: ${ALICLOUD_CREDS_USR:+yes}"'
                     sh 'echo "Region: ${ALICLOUD_REGION:-not set}"'
                 }
             }
@@ -130,7 +129,13 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            script {
+                try {
+                    cleanWs()
+                } catch (Exception e) {
+                    echo "cleanWs failed: ${e.message}"
+                }
+            }
         }
         success {
             echo "环境 ${params.ENVIRONMENT} 基础设施变更成功！"
