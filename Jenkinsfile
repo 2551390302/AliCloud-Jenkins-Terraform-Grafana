@@ -14,7 +14,11 @@ pipeline {
         ALICLOUD_CREDS = credentials('Ali-Cloud-credentials')
         ALICLOUD_REGION = 'cn-chengdu'
         
-        // 将这些映射为 Terraform 需要的变量
+        // Terraform OSS Backend 需要的环境变量（用于 state file 访问）
+        ALICLOUD_ACCESS_KEY = "${ALICLOUD_CREDS_USR}"
+        ALICLOUD_SECRET_KEY = "${ALICLOUD_CREDS_PSW}"
+        
+        // Terraform provider 需要的变量（用于资源创建）
         TF_VAR_alicloud_access_key = "${ALICLOUD_CREDS_USR}"
         TF_VAR_alicloud_secret_key = "${ALICLOUD_CREDS_PSW}"
         TF_VAR_alicloud_region = "${ALICLOUD_REGION}"
