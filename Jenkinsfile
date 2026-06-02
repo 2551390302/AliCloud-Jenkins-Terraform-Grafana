@@ -36,6 +36,23 @@ pipeline {
             }
         }
 
+        stage('Clean Terraform Cache') {
+            steps {
+                script {
+                    echo "Cleaning Terraform cache to ensure fresh initialization..."
+                    dir("Terraform/environments/${params.ENVIRONMENT}") {
+                        sh '''
+                            echo "Removing .terraform directory..."
+                            rm -rf .terraform
+                            echo "Removing .terraform.lock.hcl..."
+                            rm -f .terraform.lock.hcl
+                            echo "Cache cleaned successfully!"
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Test Alicloud Credentials') {
             steps {
                 script {
