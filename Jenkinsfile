@@ -46,6 +46,13 @@ pipeline {
                             rm -rf .terraform
                             echo "Removing .terraform.lock.hcl..."
                             rm -f .terraform.lock.hcl
+                            echo "Checking for lock file..."
+                            if [ -f .terraform.lock.hcl ]; then
+                                echo "ERROR: Lock file still exists!"
+                                exit 1
+                            else
+                                echo "Lock file removed successfully!"
+                            fi
                             echo "Cache cleaned successfully!"
                         '''
                     }
@@ -78,7 +85,10 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir("Terraform/environments/${params.ENVIRONMENT}") {
-                    sh 'terraform init'
+                    script {
+                        echo "Initializing Terraform..."
+                        sh 'terraform init -input=false'
+                    }
                 }
             }
         }
