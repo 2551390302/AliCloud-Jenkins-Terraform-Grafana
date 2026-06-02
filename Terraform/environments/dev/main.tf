@@ -207,31 +207,11 @@ resource "kubernetes_ingress_v1" "grafana" {
   ]
 }
 
-resource "alicloud_cr_instance" "acr" {
-  name               = "acr-devops01-${random_string.suffix.result}"
-  instance_type      = "Standard"
-  load_balancer_spec = "slb.s2.small"
-
-  tags = {
-    ApplicationOwner = "Kerwin Li"
-    ApplicationName  = "devops-demo"
-    Environment      = "dev"
-    CreatedAt        = formatdate("YYYY-MM-DD hh:mm:ss", time_static.this.rfc3339)
-  }
-}
-
 # ACR 个人版命名空间（免费）
 resource "alicloud_cr_namespace" "acr" {
   name               = "devops01-${random_string.suffix.result}"
   auto_create        = false
   default_visibility = "PRIVATE"
-
-  tags = {
-    ApplicationOwner = "Kerwin Li"
-    ApplicationName  = "devops-demo"
-    Environment      = "dev"
-    CreatedAt        = formatdate("YYYY-MM-DD hh:mm:ss", time_static.this.rfc3339)
-  }
 }
 
 resource "random_string" "suffix" {
