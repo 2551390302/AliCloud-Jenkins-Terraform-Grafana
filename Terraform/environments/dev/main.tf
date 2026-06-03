@@ -71,8 +71,8 @@ module "ack" {
   worker_system_disk_category = "cloud_ssd"
   worker_system_disk_size     = 40
 
-  worker_number     = 2
-  new_nat_gateway   = true
+  worker_number   = 2
+  new_nat_gateway = true
 
   tags = {
     ApplicationOwner = "Kerwin Li"
