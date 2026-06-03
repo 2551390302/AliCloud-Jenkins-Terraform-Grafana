@@ -13,13 +13,13 @@ variable "alicloud_secret_key" {
 variable "alicloud_region" {
   description = "阿里云区域"
   type        = string
-  default     = "cn-hangzhou"
+  default     = "cn-chengdu"
 }
 
 variable "alicloud_availability_zone" {
   description = "阿里云可用区"
   type        = string
-  default     = "cn-hangzhou-i"
+  default     = "cn-chengdu-a"
 }
 
 variable "feishu_webhook_url" {
