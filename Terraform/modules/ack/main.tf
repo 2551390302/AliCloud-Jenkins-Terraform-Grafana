@@ -4,8 +4,7 @@ resource "alicloud_cs_managed_kubernetes" "this" {
   vswitch_ids     = var.worker_vswitch_ids
   pod_vswitch_ids = var.pod_vswitch_ids
 
-  new_nat_gateway   = var.new_nat_gateway
-  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : null
+  new_nat_gateway = var.new_nat_gateway
 
   is_enterprise_security_group = true
 
@@ -14,12 +13,11 @@ resource "alicloud_cs_managed_kubernetes" "this" {
 
 # 创建默认节点池
 resource "alicloud_cs_kubernetes_node_pool" "default" {
-  cluster_id       = alicloud_cs_managed_kubernetes.this.id
-  node_pool_name   = "${var.cluster_name}-default-pool"
-  vswitch_ids      = var.worker_vswitch_ids
-  instance_types   = var.worker_instance_types
-  desired_size     = var.worker_number
-  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : null
+  cluster_id     = alicloud_cs_managed_kubernetes.this.id
+  node_pool_name = "${var.cluster_name}-default-pool"
+  vswitch_ids    = var.worker_vswitch_ids
+  instance_types = var.worker_instance_types
+  desired_size   = var.worker_number
 
   # 系统盘配置
   system_disk_category = var.worker_system_disk_category

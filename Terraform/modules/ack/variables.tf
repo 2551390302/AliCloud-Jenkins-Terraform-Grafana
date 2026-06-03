@@ -49,8 +49,3 @@ variable "tags" {
   default     = {}
 }
 
-variable "resource_group_id" {
-  description = "资源组 ID"
-  type        = string
-  default     = ""
-}

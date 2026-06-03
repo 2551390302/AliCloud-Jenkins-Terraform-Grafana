@@ -43,21 +43,7 @@ provider "helm" {
 
 resource "time_static" "this" {}
 
-# 尝试获取现有资源组，如果不存在则创建
-data "alicloud_resource_manager_resource_groups" "existing" {
-  name_regex = "^rg-kk01-devops01$"
-}
 
-resource "alicloud_resource_manager_resource_group" "this" {
-  count               = length(data.alicloud_resource_manager_resource_groups.existing.groups) == 0 ? 1 : 0
-  resource_group_name = "rg-kk01-devops01"
-  display_name        = "DevOps01 Development Environment"
-}
-
-# 本地变量：获取资源组 ID（已存在或新创建）
-locals {
-  resource_group_id = length(data.alicloud_resource_manager_resource_groups.existing.groups) > 0 ? data.alicloud_resource_manager_resource_groups.existing.groups[0].id : alicloud_resource_manager_resource_group.this[0].id
-}
 
 module "networking" {
   source = "../../modules/networking"
@@ -65,7 +51,6 @@ module "networking" {
   vpc_cidr_block      = "172.16.0.0/16"
   vswitch_cidr_blocks = ["172.16.1.0/24"]
   availability_zone   = var.alicloud_availability_zone
-  resource_group_id   = local.resource_group_id
 
   tags = {
     ApplicationOwner = "Kerwin Li"
@@ -88,7 +73,6 @@ module "ack" {
 
   worker_number     = 2
   new_nat_gateway   = true
-  resource_group_id = local.resource_group_id
 
   tags = {
     ApplicationOwner = "Kerwin Li"
