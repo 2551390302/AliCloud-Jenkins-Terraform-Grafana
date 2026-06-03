@@ -3,11 +3,6 @@ output "vpc_id" {
   value       = module.networking.vpc_id
 }
 
-output "resource_group_id" {
-  description = "资源组 ID"
-  value       = local.resource_group_id
-}
-
 output "vswitch_id" {
   description = "VSwitch ID"
   value       = module.networking.vswitch_id
