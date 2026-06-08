@@ -4,6 +4,10 @@ resource "alicloud_cs_managed_kubernetes" "this" {
   vswitch_ids     = var.worker_vswitch_ids
   pod_vswitch_ids = var.pod_vswitch_ids
 
+  # Pod CIDR 和 Service CIDR 配置
+  pod_cidr         = "10.1.0.0/16"
+  service_cidr     = "10.2.0.0/20"
+
   new_nat_gateway = var.new_nat_gateway
 
   is_enterprise_security_group = true

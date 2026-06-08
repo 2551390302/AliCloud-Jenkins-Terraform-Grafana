@@ -65,7 +65,7 @@ module "ack" {
 
   cluster_name       = "ack-dev-devops01"
   worker_vswitch_ids = [module.networking.vswitch_id]
-  pod_vswitch_ids    = [module.networking.vswitch_id]
+  pod_vswitch_ids    = [module.networking.pod_vswitch_id]
 
   worker_instance_types       = ["ecs.c6.xlarge"]
   worker_system_disk_category = "cloud_ssd"
@@ -192,15 +192,16 @@ resource "kubernetes_ingress_v1" "grafana" {
 }
 
 # ACR 个人版命名空间（免费）
-resource "alicloud_cr_namespace" "acr" {
-  name               = "devops01-${random_string.suffix.result}"
-  auto_create        = false
-  default_visibility = "PRIVATE"
-}
+# 注意：需要先开通ACR服务，或注释掉此资源
+# resource "alicloud_cr_namespace" "acr" {
+#   name               = "devops01-${random_string.suffix.result}"
+#   auto_create        = false
+#   default_visibility = "PRIVATE"
+# }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
+# resource "random_string" "suffix" {
+#   length  = 6
+#   special = false
+#   upper   = false
+# }
 

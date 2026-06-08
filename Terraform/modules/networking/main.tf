@@ -12,3 +12,11 @@ resource "alicloud_vswitch" "this" {
 
   tags = var.tags
 }
+
+resource "alicloud_vswitch" "pod" {
+  vpc_id     = alicloud_vpc.this.id
+  cidr_block = var.pod_vswitch_cidr_block
+  zone_id    = var.availability_zone
+
+  tags = var.tags
+}

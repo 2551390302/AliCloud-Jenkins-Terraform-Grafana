@@ -10,6 +10,12 @@ variable "vswitch_cidr_blocks" {
   default     = ["172.16.1.0/24"]
 }
 
+variable "pod_vswitch_cidr_block" {
+  description = "Pod VSwitch 的 CIDR 块"
+  type        = string
+  default     = "172.16.2.0/24"
+}
+
 variable "availability_zone" {
   description = "可用区 ID"
   type        = string
