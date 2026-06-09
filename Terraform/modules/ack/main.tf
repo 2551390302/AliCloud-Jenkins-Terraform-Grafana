@@ -3,6 +3,9 @@ resource "alicloud_cs_managed_kubernetes" "this" {
   name            = var.cluster_name
   vswitch_ids     = var.worker_vswitch_ids
 
+  # Pod VSwitch（可选，Terway 网络模式需要，Flannel 模式可省略）
+  pod_vswitch_ids = length(var.pod_vswitch_ids) > 0 ? var.pod_vswitch_ids : null
+
   # Pod CIDR 和 Service CIDR 配置
   pod_cidr         = "10.1.0.0/16"
   service_cidr     = "10.2.0.0/20"

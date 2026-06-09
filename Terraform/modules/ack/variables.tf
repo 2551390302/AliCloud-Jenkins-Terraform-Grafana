@@ -9,8 +9,9 @@ variable "worker_vswitch_ids" {
 }
 
 variable "pod_vswitch_ids" {
-  description = "Pod 的 VSwitch ID 列表"
+  description = "Pod 的 VSwitch ID 列表（可选，使用 Flannel 网络时可留空）"
   type        = list(string)
+  default     = []
 }
 
 variable "worker_instance_types" {
