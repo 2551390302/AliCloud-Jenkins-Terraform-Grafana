@@ -65,7 +65,6 @@ module "ack" {
 
   cluster_name       = "ack-dev-devops01"
   worker_vswitch_ids = [module.networking.vswitch_id]
-  pod_vswitch_ids    = [module.networking.pod_vswitch_id]
 
   worker_instance_types       = ["ecs.c6.xlarge"]
   worker_system_disk_category = "cloud_ssd"

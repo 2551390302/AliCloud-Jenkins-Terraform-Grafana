@@ -2,7 +2,6 @@
 resource "alicloud_cs_managed_kubernetes" "this" {
   name            = var.cluster_name
   vswitch_ids     = var.worker_vswitch_ids
-  pod_vswitch_ids = var.pod_vswitch_ids
 
   # Pod CIDR 和 Service CIDR 配置
   pod_cidr         = "10.1.0.0/16"
