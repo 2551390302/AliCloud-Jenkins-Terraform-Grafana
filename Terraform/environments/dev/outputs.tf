@@ -19,7 +19,7 @@ output "kubeconfig" {
   sensitive   = true
 }
 
-output "acr_namespace" {
-  description = "ACR 命名空间"
-  value       = alicloud_cr_namespace.acr.name
-}
+# output "acr_namespace" {
+#   description = "ACR 命名空间"
+#   value       = alicloud_cr_namespace.acr.name
+# }
